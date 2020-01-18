@@ -39,6 +39,8 @@ def instagram_scraping():
         body = data.find('body')
         script = body.find('script')
         raw = script.text.strip().replace('window._sharedData =', '').replace(';', '')
+        temp = '"url":"' + links[i] + '","fact_check_overall_rating"'
+        raw = raw.replace('"fact_check_overall_rating"', temp)
         json_data = json.loads(raw)
         posts = json_data['entry_data']['PostPage'][0]['graphql']['shortcode_media']
         posts = json.dumps(posts)
@@ -51,22 +53,23 @@ def instagram_scraping():
     # export the data in result to a CSV file
     result.to_csv('posts.csv')
 
-    if os.path.isfile('posts.csv'):
+    if not os.path.isfile('posts.csv'):
         gui.msgbox(
-            "The script has run successfully! Look for a CSV file called 'posts' (should be in the same folder as this"
-            " script)")
+            "Oh no! The program crashed! Make sure to only input one tag. If you entered one tag and the program still"
+            "crashed, let us know and we'll get right on it!")
+    else:
+        gui.msgbox(
+            "The program has run successfully! Look for a CSV file called 'posts' (should be in the same folder as this"
+            " program)")
 
 
 # user input
 chromedriver_install = gui.ynbox(
-    'Make sure chromedriver is installed and press OK (chromedriver.chromium.org to install). MAKE SURE TO INSTALL YOUR'
-    ' VERSION OF CHROME! You can check your version from the browser: Help > About Google Chrome',
-    'chromedriver', ['OK', 'Cancel'])
+    'Make sure the version of chromedriver installed corresponds with your version of Chrome. You can check your version from the browser: Help > About Google Chrome', 'chromedriver', ['OK', 'Cancel'])
 
 if chromedriver_install:
     chromedriver_in_path = gui.ynbox(
-        'Make sure this script is in a folder, and make sure chromedriver is in the same folder. Then press OK (the'
-        ' folder must be in PATH variable).',
+        'Make sure the script and chromedriver are in the same folder, and make sure the folder is in your OS PATH variable. If the script fails because you have the wrong version of chromedriver, simply install the correct version and try again.',
         'chromedriver', ['OK', 'Cancel'])
 
 if chromedriver_install and chromedriver_in_path:
